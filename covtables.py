@@ -1,5 +1,5 @@
 from bokeh.io import output_file, show, curdoc
-from bokeh.models import ColumnDataSource, FactorRange, Slider
+from bokeh.models import ColumnDataSource, FactorRange, Slider, NumeralTickFormatter
 from bokeh.plotting import figure
 from bokeh.transform import factor_cmap
 from bokeh.layouts import column, row, grid
@@ -10,10 +10,7 @@ palette = ["#718dbf", "#e84d60"]
 
 labels=['Random Testing', 'Symptomatic?', 'Symptomatic and Tested', 'Asymptomatic and Tested']
 sublabels=['Positive','Negative']
-#LabelT1=['People Tested at Random','COVID-19 AND Positive Test Result','NO COVID-19 BUT Positive Test Result', 'COVID-19 AND Negative Test Result','NO COVID-19 AND Negative Test Result']
-#LabelT2=['People in General Population','Have COVID-19 AND Symptomatic','Do NOT Have COVID-19 BUT Symptomatic', 'Have COVID-19 BUT Asymptomatic','Do NOT Have COVID-19 AND Asymptomatic']
-#LabelT3=['Symptomatic People Tested','COVID-19 AND Positive Test Result','NO COVID-19 BUT Positive Test Result', 'COVID-19 AND Negative Test Result','NO COVID-19 AND Negative Test Result']
-#LabelT4=['Asymptomatic People Tested','COVID-19 AND Positive Test Result','NO COVID-19 BUT Positive Test Result', 'COVID-19 AND Negative Test Result','NO COVID-19 AND Negative Test Result']
+
 LabelT1=['COVID-19 AND Positive Test Result','NO COVID-19 BUT Positive Test Result', 'COVID-19 AND Negative Test Result','NO COVID-19 AND Negative Test Result']
 LabelT2=['Have COVID-19 AND Symptomatic','Do NOT Have COVID-19 BUT Symptomatic', 'Have COVID-19 BUT Asymptomatic','Do NOT Have COVID-19 AND Asymptomatic']
 LabelT3=['COVID-19 AND Positive Test Result','NO COVID-19 BUT Positive Test Result', 'COVID-19 AND Negative Test Result','NO COVID-19 AND Negative Test Result']
@@ -118,6 +115,7 @@ p.x_range.range_padding = 0.1
 p.xaxis.major_label_orientation = 1
 p.xgrid.grid_line_color = None
 p.yaxis.axis_label = 'Likelihood of Having Covid-19'
+p.yaxis.formatter = NumeralTickFormatter(format='0 %')
 
 # Set up widgets
 Prevalence = Slider(title="Prevalence COVID-19 in Population", value=0.03, start=0.0, end=1.0, step=0.01)
@@ -126,16 +124,22 @@ FalsePos = Slider(title="False Positives", value=0.03, start=0, end=1.0, step=0.
 AsymptCase = Slider(title="Asymptomatic Cases", value=0.7, start=0, end=1.0, step=0.01)
 SymptNoCovid = Slider(title="Likelihood of Symptoms without COVID-19", value=0.005, start=0, end=0.055, step=0.005)
 
+Prevalence = Slider(title="Prevalence COVID-19 in Population %", value=3, start=0, end=100, step=1)
+FalseNeg = Slider(title="False Negatives, %", value=30, start=0, end=100, step=1)
+FalsePos = Slider(title="False Positives, %", value=3, start=0, end=100, step=1)
+AsymptCase = Slider(title="Asymptomatic Cases, %", value=70, start=0, end=100, step=1)
+SymptNoCovid = Slider(title="Likelihood of Symptoms without COVID-19, %", value=0.5, start=0, end=10, step=0.5)
+
 
 #set up callback
 def update_data(attrname, old, new):
 
     # Get the current slider values
-    pv = Prevalence.value
-    fn = FalseNeg.value
-    fp = FalsePos.value
-    ac = AsymptCase.value
-    sn = SymptNoCovid.value
+    pv = .01*Prevalence.value
+    fn = .01*FalseNeg.value
+    fp = .01*FalsePos.value
+    ac = .01*AsymptCase.value
+    sn = .01*SymptNoCovid.value
 
     # Generate the new results
     UpdatedResults,tt1,tt2,tt3,tt4 = covid_testing(pv,fn,fp,ac,sn)
