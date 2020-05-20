@@ -1,5 +1,5 @@
 from bokeh.io import output_file, show, curdoc
-from bokeh.models import ColumnDataSource, FactorRange, Slider, NumeralTickFormatter
+from bokeh.models import ColumnDataSource, FactorRange, Slider, NumeralTickFormatter, Div, LabelSet
 from bokeh.plotting import figure
 from bokeh.transform import factor_cmap
 from bokeh.layouts import column, row, grid
@@ -17,11 +17,11 @@ LabelT3=['COVID-19 AND Positive Test Result','NO COVID-19 BUT Positive Test Resu
 LabelT4=['COVID-19 AND Positive Test Result','NO COVID-19 BUT Positive Test Result', 'COVID-19 AND Negative Test Result','NO COVID-19 AND Negative Test Result']
 
 # initial parameter values
-params=0.02,0.3,0.03,0.7,0.005
+params=0.02,0.3,0.03,0.5,0.005
 pv = 0.02
 fn = 0.3
 fp = 0.03
-ac = 0.7
+ac = 0.5
 sn = 0.005
 
 # generate results
@@ -103,12 +103,17 @@ x = [ (label, sublabel) for label in labels for sublabel in sublabels ]
 counts = sum(zip(Outcomes['Positive'], Outcomes['Negative']), ()) # like an hstack
 
 source = ColumnDataSource(data=dict(x=x, counts=counts))
+# TOOLTIPS=[('prob','@counts')]
+# barlabels = LabelSet(x='x', y=('counts'*100), text='counts', level='glyph',
+        # x_offset=-13.5, y_offset=0, source=source, render_mode='canvas')
 
 p = figure(x_range=FactorRange(*x), y_range=[0,1], plot_height=450, title="Test Result Interpretation",
            toolbar_location=None, tools="")
 
 p.vbar(x='x', top='counts', width=0.9, source=source, line_color="white",
        fill_color=factor_cmap('x', palette=palette, factors=sublabels, start=1, end=2))
+
+# p.add_layout(barlabels)
 
 p.y_range.start = 0
 p.x_range.range_padding = 0.1
@@ -118,15 +123,10 @@ p.yaxis.axis_label = 'Likelihood of Having Covid-19'
 p.yaxis.formatter = NumeralTickFormatter(format='0 %')
 
 # Set up widgets
-Prevalence = Slider(title="Prevalence COVID-19 in Population", value=0.03, start=0.0, end=1.0, step=0.01)
-FalseNeg = Slider(title="False Negatives", value=0.3, start=0, end=1.0, step=0.01)
-FalsePos = Slider(title="False Positives", value=0.03, start=0, end=1.0, step=0.01)
-AsymptCase = Slider(title="Asymptomatic Cases", value=0.7, start=0, end=1.0, step=0.01)
-SymptNoCovid = Slider(title="Likelihood of Symptoms without COVID-19", value=0.005, start=0, end=0.055, step=0.005)
 
-Prevalence = Slider(title="Prevalence COVID-19 in Population %", value=3, start=0, end=100, step=1)
-FalseNeg = Slider(title="False Negatives, %", value=30, start=0, end=100, step=1)
-FalsePos = Slider(title="False Positives, %", value=3, start=0, end=100, step=1)
+Prevalence = Slider(title="Prevalence COVID-19 in Population %", value=2, start=0, end=100, step=1)
+FalseNeg = Slider(title="Sensitivity, %", value=70, start=0, end=100, step=1)
+FalsePos = Slider(title="Specificity, %", value=97, start=0, end=100, step=1)
 AsymptCase = Slider(title="Asymptomatic Cases, %", value=70, start=0, end=100, step=1)
 SymptNoCovid = Slider(title="Likelihood of Symptoms without COVID-19, %", value=0.5, start=0, end=10, step=0.5)
 
@@ -136,8 +136,8 @@ def update_data(attrname, old, new):
 
     # Get the current slider values
     pv = .01*Prevalence.value
-    fn = .01*FalseNeg.value
-    fp = .01*FalsePos.value
+    fn = .01*(100-FalseNeg.value)
+    fp = .01*(100-FalsePos.value)
     ac = .01*AsymptCase.value
     sn = .01*SymptNoCovid.value
 
@@ -168,9 +168,20 @@ for w in [Prevalence, FalseNeg, FalsePos, AsymptCase, SymptNoCovid]:
 # Set up layouts and add to document
 inputs = column(Prevalence, FalseNeg, FalsePos, AsymptCase, SymptNoCovid)
 
+# read in html strings for header and footer
+with open ("BayesHeader.txt", "r") as myfile:
+    texttop=myfile.read()
+with open ("BayesFooter.txt", "r") as myfile:
+    textbottom=myfile.read()
 
-# curdoc().add_root(data_table1)#width=800
+divtop = Div(text=texttop, sizing_mode="scale_width")   
+divbottom = Div(text=textbottom, sizing_mode="scale_width")
+
+
+# create the document
+curdoc().add_root(divtop)
 curdoc().add_root(row(inputs, p, width=800))
 curdoc().add_root(row(data_table1,data_table2,data_table3,data_table4))
+curdoc().add_root(divbottom)
 curdoc().title = "CovTables"
 # show(data_table)
