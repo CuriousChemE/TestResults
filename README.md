@@ -1,2 +1,2 @@
 # TestResults
-Bayesian interpretation of COVID-19 test results
+Bayesian interpretation of medical test results, using COVID-19 as an example.
