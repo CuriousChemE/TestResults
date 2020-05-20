@@ -127,7 +127,7 @@ p.yaxis.formatter = NumeralTickFormatter(format='0 %')
 Prevalence = Slider(title="Prevalence COVID-19 in Population %", value=2, start=0, end=100, step=1)
 FalseNeg = Slider(title="Sensitivity, %", value=70, start=0, end=100, step=1)
 FalsePos = Slider(title="Specificity, %", value=97, start=0, end=100, step=1)
-AsymptCase = Slider(title="Asymptomatic Cases, %", value=70, start=0, end=100, step=1)
+AsymptCase = Slider(title="Asymptomatic Cases, %", value=50, start=0, end=100, step=1)
 SymptNoCovid = Slider(title="Likelihood of Symptoms without COVID-19, %", value=0.5, start=0, end=10, step=0.5)
 
 
