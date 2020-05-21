@@ -101,11 +101,11 @@ data_table4 = DataTable(source=S4, columns=S4columns, width=300, height=280, ind
 # set up bar chart
 x = [ (label, sublabel) for label in labels for sublabel in sublabels ]
 counts = sum(zip(Outcomes['Positive'], Outcomes['Negative']), ()) # like an hstack
+countslabel=tuple(map("{:.0%}".format,counts))
 
-source = ColumnDataSource(data=dict(x=x, counts=counts))
-# TOOLTIPS=[('prob','@counts')]
-# barlabels = LabelSet(x='x', y=('counts'*100), text='counts', level='glyph',
-        # x_offset=-13.5, y_offset=0, source=source, render_mode='canvas')
+source = ColumnDataSource(data=dict(x=x, counts=counts, countslabel=countslabel))
+
+barlabels = LabelSet(x='x', y='counts', text='countslabel', level='glyph', source=source,x_offset=-13.5, y_offset=0)
 
 p = figure(x_range=FactorRange(*x), y_range=[0,1], plot_height=450, title="Test Result Interpretation",
            toolbar_location=None, tools="")
@@ -113,7 +113,7 @@ p = figure(x_range=FactorRange(*x), y_range=[0,1], plot_height=450, title="Test 
 p.vbar(x='x', top='counts', width=0.9, source=source, line_color="white",
        fill_color=factor_cmap('x', palette=palette, factors=sublabels, start=1, end=2))
 
-# p.add_layout(barlabels)
+p.add_layout(barlabels)
 
 p.y_range.start = 0
 p.x_range.range_padding = 0.1
@@ -127,7 +127,7 @@ p.yaxis.formatter = NumeralTickFormatter(format='0 %')
 Prevalence = Slider(title="Prevalence COVID-19 in Population %", value=2, start=0, end=100, step=1)
 FalseNeg = Slider(title="Sensitivity, %", value=70, start=0, end=100, step=1)
 FalsePos = Slider(title="Specificity, %", value=97, start=0, end=100, step=1)
-AsymptCase = Slider(title="Asymptomatic Cases, %", value=50, start=0, end=100, step=1)
+AsymptCase = Slider(title="Asymptomatic Cases, %", value=70, start=0, end=100, step=1)
 SymptNoCovid = Slider(title="Likelihood of Symptoms without COVID-19, %", value=0.5, start=0, end=10, step=0.5)
 
 
@@ -144,17 +144,15 @@ def update_data(attrname, old, new):
     # Generate the new results
     UpdatedResults,tt1,tt2,tt3,tt4 = covid_testing(pv,fn,fp,ac,sn)
     counts = sum(zip(UpdatedResults['Positive'], UpdatedResults['Negative']), ()) # like an hstack
+    countslabel=tuple(map("{:.0%}".format,counts))
+    #countslabel="{:.0%}".format(*counts)
     labs=['Random Testing', 'Symptomatic?', 'Symptomatic and Tested', 'Asymptomatic and Tested']
     subs=['Positive','Negative']
     x = [ (label, sublabel) for label in labs for sublabel in subs ]
-    # source = ColumnDataSource(data=dict(x=x, counts=counts))
-    # added .update
-    source.data=dict(x=x,counts=counts)
-    # pal = ["#718dbf", "#e84d60"]
-    # p.vbar(x='x', top='counts', source=source, line_color="white", 
-    #       fill_color=factor_cmap('x', palette=pal, factors=subs, start=1, end=2))
+    
+    source.data=dict(x=x,counts=counts,countslabel=countslabel)
+    
 
-    # source.data = dict(x=x, y=y)
     S1.data=dict(labels=LabelT1,Values=tt1['Values'])
     S2.data=dict(labels=LabelT2,Values=tt2['Values'])
     S3.data=dict(labels=LabelT3,Values=tt3['Values'])
