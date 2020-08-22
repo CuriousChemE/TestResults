@@ -17,9 +17,9 @@ LabelT3=['COVID-19 AND Positive Test Result','NO COVID-19 BUT Positive Test Resu
 LabelT4=['COVID-19 AND Positive Test Result','NO COVID-19 BUT Positive Test Result', 'COVID-19 AND Negative Test Result','NO COVID-19 AND Negative Test Result']
 
 # initial parameter values
-params=0.02,0.3,0.03,0.5,0.005
+params=0.02,0.05,0.03,0.5,0.005
 pv = 0.02
-fn = 0.3
+fn = 0.05
 fp = 0.03
 ac = 0.5
 sn = 0.005
@@ -125,7 +125,7 @@ p.yaxis.formatter = NumeralTickFormatter(format='0 %')
 # Set up widgets
 
 Prevalence = Slider(title="Prevalence COVID-19 in Population %", value=2, start=0, end=100, step=1)
-FalseNeg = Slider(title="Sensitivity, %", value=70, start=0, end=100, step=1)
+FalseNeg = Slider(title="Sensitivity, %", value=95, start=0, end=100, step=1)
 FalsePos = Slider(title="Specificity, %", value=97, start=0, end=100, step=1)
 AsymptCase = Slider(title="Asymptomatic Cases, %", value=50, start=0, end=100, step=1)
 SymptNoCovid = Slider(title="Likelihood of Symptoms without COVID-19, %", value=0.5, start=0, end=10, step=0.5)
