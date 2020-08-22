@@ -177,7 +177,8 @@ divbottom = Div(text=textbottom, sizing_mode="scale_width")
 
 
 # create the document
-curdoc().add_root(divtop)
+# for blogpost,comment out header, replace footer with copyright notice
+# curdoc().add_root(divtop)
 curdoc().add_root(row(inputs, p, width=800))
 curdoc().add_root(row(data_table1,data_table2,data_table3,data_table4))
 curdoc().add_root(divbottom)
